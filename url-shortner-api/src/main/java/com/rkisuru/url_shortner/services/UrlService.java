@@ -10,9 +10,11 @@ import com.rkisuru.url_shortner.util.Base62Encoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Service
@@ -20,8 +22,15 @@ import java.time.LocalDateTime;
 @Transactional
 public class UrlService {
 
+    @Value("${app.cache.url-ttl-seconds}")
+    private long cacheTtlSeconds;
+
+    private static final String CACHE_KEY_PREFIX = "url:shortcode:";
+
     private final UrlRepository urlRepository;
     private final Base62Encoder base62Encoder;
+
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${app.base-url}")
     private String BASE_URL = "http://localhost:8080/";
@@ -82,6 +91,16 @@ public class UrlService {
     }
 
     public String resolveLongUrl(String shortCode) {
+        String cacheKey = CACHE_KEY_PREFIX + shortCode;
+
+        // 1. Check cache first
+        String cachedUrl = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedUrl != null) {
+            incrementClickCountAsync(shortCode); // still record the click on a cache hit
+            return cachedUrl;
+        }
+
+        // 2. Cache miss — fall back to Postgres
         Url url = urlRepository.findByShortCode(shortCode)
                 .orElseThrow(() -> new UrlNotFoundException(shortCode));
 
@@ -89,9 +108,20 @@ public class UrlService {
             throw new UrlNotFoundException(shortCode);
         }
 
+        // 3. Populate cache for next time
+        redisTemplate.opsForValue().set(cacheKey, url.getLongUrl(), Duration.ofSeconds(cacheTtlSeconds));
+
         urlRepository.incrementClickCount(shortCode);
-        urlRepository.save(url);
 
         return url.getLongUrl();
+    }
+
+    private void incrementClickCountAsync(String shortCode) {
+        urlRepository.incrementClickCount(shortCode);
+    }
+
+    public void deleteUrl(String shortCode) {
+        urlRepository.deleteByShortCode(shortCode);
+        redisTemplate.delete(CACHE_KEY_PREFIX + shortCode);
     }
 }
