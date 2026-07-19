@@ -29,4 +29,10 @@ public class UrlController {
                 .header("Location", longUrl)
                 .build();
     }
+
+    @DeleteMapping("/{shortCode}")
+    public ResponseEntity<Void> deleteShortUrl(@PathVariable String shortCode) {
+        urlService.deleteUrl(shortCode);
+        return ResponseEntity.noContent().build();
+    }
 }

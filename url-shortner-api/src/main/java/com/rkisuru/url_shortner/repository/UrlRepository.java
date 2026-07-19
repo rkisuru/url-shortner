@@ -16,4 +16,8 @@ public interface UrlRepository extends JpaRepository<Url, Long> {
     @Modifying
     @Query("UPDATE Url u SET u.clickCount = u.clickCount + 1 WHERE u.shortCode = :shortCode")
     void incrementClickCount(@Param("shortCode") String shortCode);
+
+    @Modifying
+    @Query("DELETE FROM Url u WHERE u.shortCode = :shortCode")
+    void deleteByShortCode(@Param("shortCode") String shortCode);
 }
