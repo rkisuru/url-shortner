@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDateTime;
+
 public record CreateUrlRequest (
         @NotBlank(message = "longUrl must not be blank")
         @Size(max = 2048, message = "longUrl must not exceed 2048 characters")
@@ -11,6 +13,8 @@ public record CreateUrlRequest (
         String longUrl,
 
         @Pattern(regexp = "^[a-zA-Z0-9_-]{3,20}$", message = "customAlias must be 3-20 alphanumeric characters, hyphens, or underscores")
-        String customAlias // nullable — optional field
+        String customAlias, // nullable — optional field
+
+        LocalDateTime expiresAt // nullable — optional field
 ) {
 }

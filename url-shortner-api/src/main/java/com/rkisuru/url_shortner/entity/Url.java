@@ -2,11 +2,14 @@ package com.rkisuru.url_shortner.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "urls")
+@Table(name = "url_mapping", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "short_code")
+})
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,16 +21,17 @@ public class Url {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "short_code", nullable = false, unique = true, length = 10)
+    @Column(name = "short_code", nullable = false, unique = true, length = 20)
     private String shortCode;
 
     @Column(name = "long_url", nullable = false, columnDefinition = "TEXT")
     private String longUrl;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "owner_user_id")
+    private String ownerUserId;
 
-    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "expires_at")
