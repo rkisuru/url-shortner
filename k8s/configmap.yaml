@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: url-shortener
+data:
+  DB_HOST: "postgres"
+  DB_PORT: "5432"
+  DB_NAME: "url_shortener"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"
+  APP_BASE_URL: "http://localhost:8080/api/r/"
+  CACHE_TTL_SECONDS: "3600"
+  JWT_EXPIRATION_MS: "86400000"
+  USER_SERVICE_URL: "http://user-service:8081"
+  URL_SERVICE_URL: "http://url-api:8082"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+  namespace: url-shortener
+type: Opaque
+stringData:
+  DB_USER: "user"
+  DB_PASSWORD: "password"
+  RABBITMQ_USER: "guest"
+  RABBITMQ_PASSWORD: "guest"
+  JWT_SECRET: "YTJkZjRlN2QtNjg4ZS00YzQyLWIzNzAtMmM4ZjFlMjY1NjRhLXVybC1zaG9ydGVuZXItand0LXNlY3JldA=="
