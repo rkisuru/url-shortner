@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: url-shortener-api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            # ── Auth routes → User Service ──
+            - id: user-service-auth
+              uri: ${USER_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/auth/**
+
+            # ── User profile routes → User Service ──
+            - id: user-service-users
+              uri: ${USER_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/users/**
+
+            # ── Redirect routes → URL Service ──
+            - id: url-service-redirect
+              uri: ${URL_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/r/**
+
+            # ── URL CRUD routes → URL Service ──
+            - id: url-service-api
+              uri: ${URL_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/urls/**
+
+server:
+  port: ${GATEWAY_PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET:YTJkZjRlN2QtNjg4ZS00YzQyLWIzNzAtMmM4ZjFlMjY1NjRhLXVybC1zaG9ydGVuZXItand0LXNlY3JldA==}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized

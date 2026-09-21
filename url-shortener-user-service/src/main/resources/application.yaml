@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: url-shortener-user-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:url_shortener}
+    username: ${DB_USER:user}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        default_schema: user_service
+        hbm2ddl:
+          create_namespaces: true
+
+server:
+  port: 8081
+
+jwt:
+  secret: ${JWT_SECRET:YTJkZjRlN2QtNjg4ZS00YzQyLWIzNzAtMmM4ZjFlMjY1NjRhLXVybC1zaG9ydGVuZXItand0LXNlY3JldA==}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized

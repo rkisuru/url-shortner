@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: url-shortner-api
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:url_shortener}
+    username: ${DB_USER:user}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        default_schema: url_service
+        hbm2ddl:
+          create_namespaces: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+server:
+  port: 8082
+
+jwt:
+  secret: ${JWT_SECRET:YTJkZjRlN2QtNjg4ZS00YzQyLWIzNzAtMmM4ZjFlMjY1NjRhLXVybC1zaG9ydGVuZXItand0LXNlY3JldA==}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8080/api/r/}
+  cache:
+    url-ttl-seconds: ${CACHE_TTL_SECONDS:3600}
